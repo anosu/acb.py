@@ -162,14 +162,18 @@ class R(object):
         self.f.seek(bk + len(string) + 1)
         return string.decode(self.encoding)
 
-class Struct(struct.Struct):
+class Struct:
     """ struct with an output filter (usually a namedtuple) """
     def __init__(self, fmt, out_type):
-        struct.Struct.__init__(self, fmt)
+        self.struct = struct.Struct(fmt)
         self.out_type = out_type
 
     def unpack(self, buf):
-        return self.out_type(* struct.Struct.unpack(self, buf))
+        return self.out_type(*self.struct.unpack(buf))
+
+    @property
+    def size(self):
+        return self.struct.size
 
 COLUMN_STORAGE_MASK = 0xF0
 COLUMN_STORAGE_PERROW = 0x50
